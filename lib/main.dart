@@ -1,10 +1,16 @@
 import 'package:final_project/constants.dart';
-import 'package:final_project/welcome_page/components/body.dart';
+import 'package:final_project/cubit/main-cubit.dart';
 import 'package:final_project/welcome_page/welcome-user.dart';
-import 'package:final_project/user_login/user-login.dart';
+// import 'package:final_project/user_login/components/body.dart';
+// import 'package:final_project/welcome_page/components/body.dart';
+// import 'package:final_project/welcome_page/welcome-user.dart';
+// import 'package:final_project/user_login/user-login.dart';
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'dart:convert';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:web_socket_channel/io.dart';
+// import 'package:web_socket_channel/web_socket_channel.dart';
+// import 'dart:convert';
+import 'package:final_project/home_page/home.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,58 +27,87 @@ class MyApp extends StatelessWidget {
         primaryColor: kPrimaryColor,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: WelcomeScreen(),
+      home: BlocProvider(
+        create: (context) => MainCubit(),
+        child: UserLogin(),
+      ),
     );
   }
 }
 
-// class UserNameWidget extends StatefulWidget {
-//   const UserNameWidget({Key? key}) :super(key: key);
+class UserLogin extends StatefulWidget {
+  const UserLogin({Key? key}) : super(key: key);
 
-//   @override
-//   _UserNameWidget createState() => _UserNameWidget();
-// }
+  @override
+  _UserLoginState createState() => _UserLoginState();
+}
 
-// class _UserNameWidget extends State<UserNameWidget> {
+class _UserLoginState extends State<UserLogin> {
 
-//   final userpost_api = WebSocketChannel.connect(Uri.parse('ws://besquare-demo.herokuapp.com'));
+  TextEditingController username = TextEditingController();
 
-//   void initState() {
-//     ApiStream();
-//   }
+  final channel = IOWebSocketChannel.connect('ws://besquare-demo.herokuapp.com');
 
-//   void ApiStream() {
-//     userpost_api.stream.listen((message) {
-//       final decodedMessage = jsonDecode(message);
-
-//       print(decodedMessage);
-//     });
-
-//     void _getPostResponse() {
-//       userpost_api.sink.add('{"type": "get_posts"}');
-//     }
-
-//     void _getSignInResponse(String userInput) {
-//       userpost_api.sink
-//       .add('{"type": "sign_in", "data": {"name": "$userInput"}}');
-//     }
-
-//     void _getToPost(String title, String description, String image) {
-//       userpost_api.sink.add(
-//       '{"type": "create_post", "data": {"title": "$title", "description": "$description", "image": "$image"}}');
-//     }
-
-//     void _getTodeletePost(String postId) {
-//       userpost_api.sink
-//       .add('{"type": "delete_post", "data": {"postId": "$postId"}}');
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Body();
-//     // TODO: implement build
-//     throw UnimplementedError();
-//   }
-// }
-
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        color: Colors.deepOrange.shade100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "LOGIN",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+            ),
+            SizedBox(height: 60),
+            Image.asset(
+              "assets/image/besquare_logo.png",
+              height: 100,
+            ),
+            SizedBox(height: 60),
+            Container(
+              color: Colors.deepOrange.shade50,
+              child: TextFormField(
+                textAlign: TextAlign.center,
+                controller: username,
+                decoration: const InputDecoration(
+                  hintText: 'Username'
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                (username.text.isEmpty)
+                // ignore: unnecessary_statements
+                ? {print('Please input your username!')}
+                // ignore: unnecessary_statements
+                : {
+                  _signInUser(),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                    builder: (context) => HomePageScreen(),
+                    ),
+                  )
+                };
+              },
+              child: const Text(
+                'Sign-In',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          ]
+        ),
+      ),
+    );
+  }
+    _signInUser() {
+    // Sending user sign in request
+    context.read<MainCubit>().userLogin(username.text);
+  }
+}

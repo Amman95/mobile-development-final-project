@@ -1,3 +1,4 @@
+import 'package:final_project/main.dart';
 import 'package:final_project/user_login/components/background.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project/user_login/user-login.dart';
@@ -14,8 +15,8 @@ class Body extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Welcome To BeSquare App!",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              "Welcome To BeSquareBook!",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
             ),
             SizedBox(height: size.height * 0.05),
             Image.asset(
@@ -29,7 +30,7 @@ class Body extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
+                    builder: (context) => UserLogin(),
                   ),
                 );
               },
